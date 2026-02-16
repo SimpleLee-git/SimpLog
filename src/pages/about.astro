@@ -1,0 +1,49 @@
+---
+import { Image } from 'astro:assets';
+import Layout from '../layouts/BlogPost.astro';
+import profileImage from '../assets/images/profile_smiling.png';
+---
+
+<Layout
+	title="About Me"
+	description="목회자이자 개발자로서의 저를 소개합니다."
+	pubDate={new Date('2024-02-16')}
+>
+	<div class="flex justify-center mb-12">
+		<div class="w-48 h-48 rounded-full overflow-hidden border-4 border-[var(--border-color)] shadow-sm">
+			<Image 
+				src={profileImage} 
+				alt="프로필 이미지" 
+				class="w-full h-full object-cover"
+			/>
+		</div>
+	</div>
+	<p>
+		반갑습니다. 저는 목회자이자 개발자인 <strong>SimpleLog의 오두막 지기</strong>입니다. <br />
+		저의 관심사는 크게 세 가지로 나뉩니다.
+	</p>
+
+	<h3>1. 목회와 성경연구 (Ministry)</h3>
+	<p>
+		성경의 바른 연구와 신학적 성찰을 통해, 이 시대에 필요한 성경적 교회의 모습을 고민합니다. 
+		논쟁보다는 하나님이 기뻐하시는 삶을 사는 것이 중요하다고 생각합니다.
+	</p>
+
+	<h3>2. 개발과 자동화 (Dev)</h3>
+	<p>
+		급속도로 발전하는 AI는 이제 모든 이를 돕기에 충분할 정도로 성장했습니다.
+		AI를 두려워하기보다는 우리의 파트너로 삼아 소중한 것에 집중할 수 있도록 합니다.
+	</p>
+
+	<h3>3. 단순한 삶 (Simple Life)</h3>
+	<p>
+		그리스도를 따르는 삶은 나그네 같은 단순한 삶의 양식을 갖습니다. 똑똑한 파트너(AI)까지 함께 한다면 더 그렇죠.
+		나아가 단순한 삶은 그 자체로도 가치가 있습니다.
+	</p>
+
+	<hr />
+	<p>
+		이 공간이 누군가에게는 영적인 통찰을, 누군가에게는 기술적인 도움을, 
+		그리고 또 누군가에게는 잠시 쉬어갈 수 있는 평안을 주는 곳이 되기를 소망합니다.
+	</p>
+</Layout>

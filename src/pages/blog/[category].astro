@@ -1,0 +1,77 @@
+---
+import { getCollection } from 'astro:content';
+import BaseHead from '../../components/BaseHead.astro';
+import Footer from '../../components/Footer.astro';
+import FormattedDate from '../../components/FormattedDate.astro';
+import Header from '../../components/Header.astro';
+import { SITE_DESCRIPTION, SITE_TITLE } from '../../consts';
+
+export async function getStaticPaths() {
+	const allPosts = await getCollection('blog');
+	const categories = ['ministry', 'dev', 'life'];
+	
+	return categories.map((category) => {
+		const filteredPosts = allPosts
+			.filter((post) => post.data.category === category)
+			.sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
+		return {
+			params: { category },
+			props: { posts: filteredPosts },
+		};
+	});
+}
+
+const { category } = Astro.params;
+const { posts } = Astro.props;
+
+const categoryMap: Record<string, string> = {
+	ministry: '목회 및 성경연구',
+	dev: '개발 및 AI 자동화',
+	life: '심플라이프 및 여행',
+};
+
+const categoryTitle = categoryMap[category as string] || category;
+---
+
+<!doctype html>
+<html lang="ko">
+	<head>
+		<BaseHead title={`${categoryTitle} | ${SITE_TITLE}`} description={SITE_DESCRIPTION} />
+	</head>
+	<body class="max-w-4xl mx-auto">
+		<Header />
+		<main class="px-6 py-12">
+			<section>
+				<div class="flex items-center gap-4 mb-12">
+					<h1 class="text-3xl font-bold tracking-tight">{categoryTitle}</h1>
+					<a href="/blog" class="text-sm text-[var(--text-muted)] hover:text-[var(--text-main)] underline underline-offset-4">모든 글 보기</a>
+				</div>
+				<ul class="space-y-12">
+					{
+						posts.map((post) => (
+							<li class="group">
+								<a href={`/blog/${post.id}/`} class="block hover:no-underline">
+									<div class="flex flex-col md:flex-row md:items-baseline justify-between gap-2">
+										<h2 class="text-xl font-semibold group-hover:text-[var(--text-muted)] transition-colors">
+											{post.data.title}
+										</h2>
+										<p class="text-sm text-[var(--text-muted)] whitespace-nowrap">
+											<FormattedDate date={post.data.pubDate} />
+										</p>
+									</div>
+									<p class="mt-2 text-[var(--text-muted)] group-hover:text-[var(--text-main)] transition-colors">
+										{post.data.description}
+									</p>
+								</a>
+							</li>
+						))
+					}
+				</ul>
+				{posts.length === 0 && (
+					<p class="text-[var(--text-muted)] italic">아직 작성된 글이 없습니다.</p>
+				)}
+			</section>
+		</main>
+		<Footer />
+	</body>
+</html>

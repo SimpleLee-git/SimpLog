@@ -1,0 +1,55 @@
+---
+import { Image } from 'astro:assets';
+import BaseHead from '../components/BaseHead.astro';
+import Footer from '../components/Footer.astro';
+import Header from '../components/Header.astro';
+import { SITE_DESCRIPTION, SITE_TITLE } from '../consts';
+import heroIllustration from '../assets/images/hero_illustration_final.png';
+---
+
+<!doctype html>
+<html lang="ko">
+	<head>
+		<BaseHead title={SITE_TITLE} description={SITE_DESCRIPTION} />
+	</head>
+	<body class="max-w-4xl mx-auto">
+		<Header />
+		<main>
+			<section class="py-12 md:py-20 px-6">
+				<div class="flex flex-col md:flex-row items-center justify-between gap-12">
+					<div class="flex-1">
+						<h1 class="text-4xl md:text-5xl font-bold mb-8 leading-snug">
+							어느 목회자의<br/>단순한 오두막
+						</h1>
+						<p class="text-xl text-[var(--text-muted)] max-w-2xl mb-12">
+							그리스도인의 평안과 개발자의 편안 <br/>
+							그로인한 소박한 삶의 기쁨을 나눕니다.
+						</p>
+					</div>
+					<div class="flex-1 max-w-sm">
+						<Image src={heroIllustration} alt="성경 연구하는 목회자 일러스트" class="w-full h-auto opacity-95 rounded-lg shadow-sm" />
+					</div>
+				</div>
+				
+				<div class="grid grid-cols-1 md:grid-cols-3 gap-8 py-12 border-t border-[var(--border-color)]">
+					<div>
+						<h3 class="font-bold mb-4">Ministry</h3>
+						<p class="text-sm text-[var(--text-muted)] mb-4">올바른 성경연구와 성경적 교회를 위한 고민들</p>
+						<a href="/blog/ministry" class="nav-link text-xs">글 보러가기 &rarr;</a>
+					</div>
+					<div>
+						<h3 class="font-bold mb-4">Dev</h3>
+						<p class="text-sm text-[var(--text-muted)] mb-4">AI 파트너와 함께하는 효율적인 삶</p>
+						<a href="/blog/dev" class="nav-link text-xs">글 보러가기 &rarr;</a>
+					</div>
+					<div>
+						<h3 class="font-bold mb-4">Simple Life</h3>
+						<p class="text-sm text-[var(--text-muted)] mb-4">간소한 삶과 여행에서 만나는 기쁨</p>
+						<a href="/blog/life" class="nav-link text-xs">글 보러가기 &rarr;</a>
+					</div>
+				</div>
+			</section>
+		</main>
+		<Footer />
+	</body>
+</html>

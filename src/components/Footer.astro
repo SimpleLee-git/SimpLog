@@ -1,0 +1,8 @@
+---
+import { SITE_TITLE } from '../consts';
+const today = new Date();
+---
+
+<footer class="py-12 px-6 text-center text-sm text-[var(--text-muted)] border-t border-[var(--border-color)]">
+	&copy; {today.getFullYear()} {SITE_TITLE}. All rights reserved.
+</footer>
