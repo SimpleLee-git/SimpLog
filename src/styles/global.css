@@ -22,7 +22,9 @@ body {
   @apply font-serif text-lg leading-relaxed max-w-none;
 }
 
-.prose h1, .prose h2, .prose h3 {
+.prose h1,
+.prose h2,
+.prose h3 {
   @apply font-sans font-bold tracking-tight mt-12 mb-6;
 }
 
@@ -40,4 +42,69 @@ a {
 
 .card {
   @apply p-6 border border-[var(--border-color)] rounded-lg hover:shadow-sm transition-all;
+}
+
+/* Obsidian Callouts Styling */
+.obsidian-callout {
+  @apply mb-8 p-4 border-l-4 rounded-r-lg;
+  border-left-width: 4px;
+}
+
+.obsidian-callout-title {
+  @apply flex items-center gap-2 font-bold mb-2 uppercase tracking-wide text-sm;
+}
+
+.obsidian-callout-content {
+  @apply text-base opacity-90;
+}
+
+/* Callout Types */
+.obsidian-callout[data-callout-type="note"],
+.obsidian-callout[data-callout-type="info"] {
+  @apply border-blue-500 bg-blue-50;
+}
+
+.obsidian-callout[data-callout-type="note"] .obsidian-callout-title,
+.obsidian-callout[data-callout-type="info"] .obsidian-callout-title {
+  @apply text-blue-700;
+}
+
+.obsidian-callout[data-callout-type="warning"],
+.obsidian-callout[data-callout-type="caution"] {
+  @apply border-orange-500 bg-orange-50;
+}
+
+.obsidian-callout[data-callout-type="warning"] .obsidian-callout-title,
+.obsidian-callout[data-callout-type="caution"] .obsidian-callout-title {
+  @apply text-orange-700;
+}
+
+.obsidian-callout[data-callout-type="error"],
+.obsidian-callout[data-callout-type="danger"] {
+  @apply border-red-500 bg-red-50;
+}
+
+.obsidian-callout[data-callout-type="error"] .obsidian-callout-title,
+.obsidian-callout[data-callout-type="danger"] .obsidian-callout-title {
+  @apply text-red-700;
+}
+
+.obsidian-callout[data-callout-type="success"],
+.obsidian-callout[data-callout-type="check"] {
+  @apply border-green-500 bg-green-50;
+}
+
+.obsidian-callout[data-callout-type="success"] .obsidian-callout-title,
+.obsidian-callout[data-callout-type="check"] .obsidian-callout-title {
+  @apply text-green-700;
+}
+
+.obsidian-callout[data-callout-type="tip"],
+.obsidian-callout[data-callout-type="hint"] {
+  @apply border-purple-500 bg-purple-50;
+}
+
+.obsidian-callout[data-callout-type="tip"] .obsidian-callout-title,
+.obsidian-callout[data-callout-type="hint"] .obsidian-callout-title {
+  @apply text-purple-700;
 }

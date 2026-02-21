@@ -1,0 +1,418 @@
+---
+import { Icon } from "astro-icon/components";
+
+interface Props {
+    postSlug: string;
+}
+
+const { postSlug } = Astro.props;
+---
+
+<div
+    class="comments-section mt-12 pt-8 border-t border-gray-200 dark:border-gray-800"
+    data-post-slug={postSlug}
+>
+    <h3
+        class="text-2xl font-bold mb-6 text-gray-900 dark:text-gray-100 flex items-center gap-2"
+    >
+        <Icon name="ph:chat-circle-text" class="w-6 h-6" /> Comments <span
+            id="comments-count"
+            class="text-sm font-normal text-gray-500">(0)</span
+        >
+    </h3>
+
+    <!-- Authentication Alert / Login Buttons -->
+    <div
+        id="auth-section"
+        class="mb-8 p-6 bg-gray-50 dark:bg-gray-800/50 rounded-xl border border-gray-100 dark:border-gray-800 text-center"
+    >
+        <p class="text-gray-600 dark:text-gray-400 mb-4">
+            Leave a comment to join the discussion.
+        </p>
+        <div class="flex flex-wrap justify-center gap-3">
+            <button
+                id="login-google"
+                class="flex items-center gap-2 px-5 py-2.5 bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors shadow-sm"
+            >
+                <Icon name="logos:google-icon" class="w-5 h-5" />
+                Continue with Google
+            </button>
+        </div>
+    </div>
+
+    <!-- Comment Input Area (Hidden initially) -->
+    <div id="comment-form-section" class="mb-10 hidden">
+        <div class="flex items-start gap-4">
+            <img
+                id="current-user-avatar"
+                src=""
+                alt="User Avatar"
+                class="w-10 h-10 rounded-full bg-gray-200 object-cover flex-shrink-0"
+            />
+            <div class="flex-grow">
+                <div class="mb-2 flex items-center justify-between">
+                    <span
+                        id="current-user-name"
+                        class="font-medium text-gray-900 dark:text-gray-100 block"
+                    ></span>
+                    <button
+                        id="logout-button"
+                        class="text-xs text-gray-500 hover:text-red-500 transition-colors"
+                        >Sign out</button
+                    >
+                </div>
+                <form
+                    id="comment-form"
+                    class="group flex flex-col items-end gap-2"
+                >
+                    <textarea
+                        id="comment-input"
+                        rows="3"
+                        class="w-full p-4 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all resize-none shadow-sm placeholder:text-gray-400"
+                        placeholder="Write your thoughts..."
+                        required></textarea>
+                    <button
+                        type="submit"
+                        id="submit-comment"
+                        class="px-5 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm font-medium transition-colors shadow-sm disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center min-w-[100px]"
+                    >
+                        댓글쓰기
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Comments List -->
+    <div id="comments-list" class="space-y-6">
+        <!-- Comments will be injected here via JS -->
+        <div
+            id="loading-comments"
+            class="text-center py-8 text-gray-500 flex flex-col items-center justify-center gap-2"
+        >
+            <Icon
+                name="ph:spinner-gap-bold"
+                class="w-6 h-6 animate-spin text-blue-500"
+            />
+            <span class="text-sm">Loading comments...</span>
+        </div>
+    </div>
+</div>
+
+<script>
+    import { supabase } from "../lib/supabase";
+    import { formatDistanceToNow } from "date-fns";
+
+    const commentsSection = document.querySelector(
+        ".comments-section"
+    ) as HTMLElement;
+    if (commentsSection) {
+        const postSlug = commentsSection.dataset.postSlug;
+
+        // DOM Elements
+        const authSection = document.getElementById("auth-section");
+        const commentFormSection = document.getElementById(
+            "comment-form-section"
+        );
+        const commentsList = document.getElementById("comments-list");
+        const loadingEl = document.getElementById("loading-comments");
+        const commentsCount = document.getElementById("comments-count");
+        const commentForm = document.getElementById(
+            "comment-form"
+        ) as HTMLFormElement;
+        const commentInput = document.getElementById(
+            "comment-input"
+        ) as HTMLTextAreaElement;
+        const submitBtn = document.getElementById(
+            "submit-comment"
+        ) as HTMLButtonElement;
+
+        const loginGoogleBtn = document.getElementById("login-google");
+        const logoutBtn = document.getElementById("logout-button");
+
+        const currentUserAvatar = document.getElementById(
+            "current-user-avatar"
+        ) as HTMLImageElement;
+        const currentUserName = document.getElementById("current-user-name");
+
+        let currentUser: any = null;
+
+        // Initialize
+        async function init() {
+            await checkUser();
+            await fetchComments();
+            setupAuthListeners();
+            setupEventListeners();
+        }
+
+        // Auth flows
+        async function checkUser() {
+            const {
+                data: { session },
+            } = await supabase.auth.getSession();
+
+            if (session) {
+                currentUser = session.user;
+                showCommentForm(currentUser);
+            } else {
+                currentUser = null;
+                showAuthSection();
+            }
+        }
+
+        function setupAuthListeners() {
+            supabase.auth.onAuthStateChange((_event, session) => {
+                if (session) {
+                    currentUser = session.user;
+                    showCommentForm(currentUser);
+                } else {
+                    currentUser = null;
+                    showAuthSection();
+                }
+            });
+
+            loginGoogleBtn?.addEventListener("click", () => {
+                supabase.auth.signInWithOAuth({
+                    provider: "google",
+                    options: {
+                        redirectTo: window.location.href,
+                    },
+                });
+            });
+
+            logoutBtn?.addEventListener("click", async () => {
+                await supabase.auth.signOut();
+                window.location.reload(); // Refresh to clean up state
+            });
+        }
+
+        // UI Updates
+        function showCommentForm(user: any) {
+            if (authSection) authSection.classList.add("hidden");
+            if (commentFormSection)
+                commentFormSection.classList.remove("hidden");
+
+            const avatarUrl =
+                user.user_metadata?.avatar_url ||
+                `https://ui-avatars.com/api/?name=${encodeURIComponent(
+                    user.user_metadata?.full_name || "U"
+                )}`;
+            if (currentUserAvatar) currentUserAvatar.src = avatarUrl;
+            if (currentUserName)
+                currentUserName.textContent =
+                    user.user_metadata?.full_name ||
+                    user.email?.split("@")[0] ||
+                    "User";
+        }
+
+        function showAuthSection() {
+            if (authSection) authSection.classList.remove("hidden");
+            if (commentFormSection) commentFormSection.classList.add("hidden");
+        }
+
+        // Data Fetching and Rendering
+        async function fetchComments() {
+            if (!postSlug) return;
+
+            const { data, error } = await supabase
+                .from("comments")
+                .select("*")
+                .eq("post_slug", postSlug)
+                .order("created_at", { ascending: true });
+
+            if (error) {
+                console.error("Error fetching comments:", error);
+                if (loadingEl)
+                    loadingEl.innerHTML = `<span class="text-red-500">Failed to load comments.</span>`;
+                return;
+            }
+
+            renderComments(data);
+        }
+
+        function renderComments(comments: any[]) {
+            if (!commentsList) return;
+
+            // Update count
+            if (commentsCount)
+                commentsCount.textContent = `(${comments.length})`;
+
+            // Clear loading
+            if (loadingEl) loadingEl.remove();
+
+            if (comments.length === 0) {
+                commentsList.innerHTML = `<div class="text-center py-8 text-gray-500 italic bg-gray-50/50 dark:bg-gray-800/20 rounded-xl border border-dashed border-gray-200 dark:border-gray-700">No comments yet. Be the first to share your thoughts!</div>`;
+                return;
+            }
+
+            commentsList.innerHTML = "";
+
+            comments.forEach((comment: any) => {
+                const isOwner =
+                    currentUser && currentUser.id === comment.user_id;
+                const timeAgo = formatDistanceToNow(
+                    new Date(comment.created_at),
+                    { addSuffix: true }
+                );
+
+                // Sanitize content minimally (Supabase returns plain text if inserted that way, but let's be safe against basic html tags in vanilla JS textContent)
+                const contentDiv = document.createElement("div");
+                contentDiv.textContent = comment.content;
+                const safeContent = contentDiv.innerHTML.replace(/\n/g, "<br>"); // preserve newlines
+
+                const avatarUrl =
+                    comment.author_avatar_url ||
+                    `https://ui-avatars.com/api/?name=${encodeURIComponent(
+                        comment.author_name
+                    )}`;
+
+                const commentEl = document.createElement("div");
+                commentEl.className =
+                    "group flex gap-4 p-4 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors";
+                commentEl.id = `comment-${comment.id}`;
+
+                let deleteBtnHtml = "";
+                if (isOwner) {
+                    deleteBtnHtml = `
+            <button type="button" data-id="${comment.id}" class="delete-btn opacity-0 group-hover:opacity-100 text-gray-400 hover:text-red-500 transition-all text-sm p-1 rounded hover:bg-red-50 dark:hover:bg-red-900/20">
+               삭제
+            </button>
+          `;
+                }
+
+                commentEl.innerHTML = `
+          <img src="${avatarUrl}" alt="${comment.author_name}" class="w-10 h-10 rounded-full object-cover flex-shrink-0 bg-gray-200" loading="lazy" />
+          <div class="flex-grow">
+            <div class="flex items-baseline justify-between mb-1">
+              <span class="font-medium text-gray-900 dark:text-gray-100">${comment.author_name}</span>
+              <div class="flex items-center gap-3">
+                <span class="text-xs text-gray-500">${timeAgo}</span>
+                ${deleteBtnHtml}
+              </div>
+            </div>
+            <p class="text-gray-700 dark:text-gray-300 leading-relaxed text-sm break-words">${safeContent}</p>
+          </div>
+        `;
+
+                commentsList.appendChild(commentEl);
+            });
+
+            // Attach delete listeners directly to buttons again but cleanly to avoid form conflicts
+            const deleteBtns = commentsList.querySelectorAll(".delete-btn");
+            deleteBtns.forEach((btn) => {
+                // Must clone/replace to tear down old listeners before adding new one in vanilla JS
+                const newBtn = btn.cloneNode(true) as HTMLButtonElement;
+                if (btn.parentNode) {
+                    btn.parentNode.replaceChild(newBtn, btn);
+                }
+                let isConfirming = false;
+                newBtn.addEventListener("click", async (e) => {
+                    e.preventDefault();
+                    e.stopPropagation(); // Stop event bubbling completely
+                    const id = newBtn.dataset.id;
+
+                    if (!isConfirming) {
+                        isConfirming = true;
+                        newBtn.textContent = "정말요?";
+                        newBtn.classList.remove("text-gray-400");
+                        newBtn.classList.add("text-red-600", "font-bold");
+
+                        setTimeout(() => {
+                            if (isConfirming) {
+                                isConfirming = false;
+                                newBtn.textContent = "삭제";
+                                newBtn.classList.add("text-gray-400");
+                                newBtn.classList.remove(
+                                    "text-red-600",
+                                    "font-bold"
+                                );
+                            }
+                        }, 3000);
+                        return;
+                    }
+
+                    if (id) {
+                        newBtn.textContent = "삭제 중...";
+                        await deleteComment(id);
+                    }
+                });
+            });
+        }
+
+        // Actions
+        function setupEventListeners() {
+            if (commentForm) {
+                commentForm.addEventListener("submit", async (e) => {
+                    e.preventDefault();
+
+                    if (!currentUser || !postSlug) return;
+
+                    const content = commentInput?.value.trim();
+                    if (!content) return;
+
+                    // Disable button
+                    if (submitBtn) {
+                        submitBtn.disabled = true;
+                        submitBtn.innerHTML =
+                            '<Icon name="ph:spinner-gap-bold" class="w-4 h-4 animate-spin mr-1 inline" /> 저장 중...';
+                    }
+
+                    const newComment = {
+                        post_slug: postSlug,
+                        user_id: currentUser.id,
+                        author_name:
+                            currentUser.user_metadata?.full_name ||
+                            currentUser.email?.split("@")[0] ||
+                            "User",
+                        author_avatar_url:
+                            currentUser.user_metadata?.avatar_url,
+                        content: content,
+                    };
+
+                    const { error } = await supabase
+                        .from("comments")
+                        .insert([newComment]);
+
+                    if (error) {
+                        console.error("Error posting comment:", error);
+                        alert("Failed to post comment.");
+                    } else {
+                        commentInput.value = "";
+                        await fetchComments(); // Refresh list
+                    }
+
+                    // Enable button
+                    if (submitBtn) {
+                        submitBtn.disabled = false;
+                        submitBtn.innerHTML = "댓글쓰기";
+                    }
+                });
+            }
+
+            // Auto-resize textarea
+            if (commentInput) {
+                commentInput.addEventListener("input", function () {
+                    this.style.height = "auto";
+                    this.style.height = this.scrollHeight + "px";
+                });
+            }
+        }
+
+        async function deleteComment(id: string) {
+            const { error } = await supabase
+                .from("comments")
+                .delete()
+                .eq("id", id);
+
+            if (error) {
+                console.error("Error deleting comment:", error);
+                alert("삭제 실패: " + error.message);
+            } else {
+                await fetchComments(); // Refresh list
+            }
+        }
+
+        // Start everything
+        init();
+    }
+</script>

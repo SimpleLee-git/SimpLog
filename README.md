@@ -2,18 +2,6 @@
 
 Astro 기반의 미니멀리스트 블로그 프로젝트입니다.
 
-## 워크스페이스 이동 방법
-
-현재 이 프로젝트는 임시 폴더에 있습니다. 다음 순서대로 원하는 위치로 이동하여 관리하세요:
-
-1. 터미널을 열고 다음 명령어를 실행하여 폴더를 이동합니다:
-   ```bash
-   mv /Users/ldh/.gemini/antigravity/playground/quantum-singularity /Users/ldh/Dev/SimpleLog
-   ```
-2. 이동한 폴더로 들어갑니다:
-   ```bash
-   cd /Users/ldh/Dev/SimpleLog
-   ```
 
 ## GitHub Pages 배포 방법
 

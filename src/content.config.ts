@@ -8,7 +8,7 @@ const blogSchema = ({ image }) =>
 		pubDate: z.coerce.date(),
 		updatedDate: z.coerce.date().optional(),
 		heroImage: image().optional(),
-		category: z.enum(['ministry', 'dev', 'life']).optional(),
+		tags: z.array(z.string()).default([]),
 	});
 
 const blog = defineCollection({
