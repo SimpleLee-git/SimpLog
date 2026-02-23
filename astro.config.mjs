@@ -78,8 +78,8 @@ function remarkObsidian() {
 
 // https://astro.build/config
 export default defineConfig({
-  site: 'https://vineLee.github.io',
-  base: '/SimpleLog',
+  site: 'https://SimpleLee-git.github.io',
+  base: '/SimpLog',
   integrations: [
     mdx({
       remarkPlugins: [remarkObsidian, remarkObsidianCallout],
