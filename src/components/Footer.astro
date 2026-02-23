@@ -1,8 +1,19 @@
 ---
-import { SITE_TITLE } from '../consts';
+import { SITE_TITLE } from "../consts";
 const today = new Date();
 ---
 
-<footer class="py-12 px-6 text-center text-sm text-[var(--text-muted)] border-t border-[var(--border-color)]">
-	&copy; {today.getFullYear()} {SITE_TITLE}. All rights reserved.
+<footer
+	class="py-12 px-6 text-center text-sm text-[var(--text-muted)] border-t border-[var(--border-color)]"
+>
+	<div class="mb-2">
+		&copy; {today.getFullYear()}
+		{SITE_TITLE}. All rights reserved.
+	</div>
+	<div class="text-xs opacity-75">
+		본 블로그의 모든 콘텐츠는 작성자에게 저작권이 있으며, <strong
+			>영리적 목적의 이용 및 무단 도용을 엄격히 금지합니다.</strong
+		><br />
+		(This work is licensed under CC BY-NC-ND 4.0)
+	</div>
 </footer>
