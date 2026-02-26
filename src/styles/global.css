@@ -4,7 +4,7 @@
   --bg-color: #fdfdfd;
   --text-main: #2d3436;
   --text-muted: #636e72;
-  --accent: #2d3436;
+  --accent: #2b7a4b;
   --border-color: #edf2f7;
 }
 
@@ -33,11 +33,11 @@ body {
 }
 
 a {
-  @apply transition-colors duration-200 border-b border-transparent hover:border-current;
+  @apply transition-colors duration-200 border-b border-transparent hover:border-[var(--accent)] hover:text-[var(--accent)];
 }
 
 .nav-link {
-  @apply text-sm uppercase tracking-widest text-[var(--text-muted)] hover:text-[var(--text-main)];
+  @apply text-sm uppercase tracking-widest text-[var(--text-muted)] hover:text-[var(--accent)];
 }
 
 .card {
