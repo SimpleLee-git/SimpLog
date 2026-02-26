@@ -22,12 +22,8 @@ const { title, description, image = FallbackImage } = Astro.props;
 <meta name="viewport" content="width=device-width,initial-scale=1" />
 <link
 	rel="icon"
-	type="image/svg+xml"
-	href={`${import.meta.env.BASE_URL.replace(/\/$/, "")}/favicon.svg`}
-/>
-<link
-	rel="icon"
-	href={`${import.meta.env.BASE_URL.replace(/\/$/, "")}/favicon.ico`}
+	type="image/png"
+	href={`${import.meta.env.BASE_URL.replace(/\/$/, "")}/favicon.png`}
 />
 <link
 	rel="sitemap"
@@ -46,7 +42,7 @@ const { title, description, image = FallbackImage } = Astro.props;
 	rel="preload"
 	href={`${import.meta.env.BASE_URL.replace(
 		/\/$/,
-		""
+		"",
 	)}/fonts/atkinson-regular.woff`}
 	as="font"
 	type="font/woff"
@@ -56,7 +52,7 @@ const { title, description, image = FallbackImage } = Astro.props;
 	rel="preload"
 	href={`${import.meta.env.BASE_URL.replace(
 		/\/$/,
-		""
+		"",
 	)}/fonts/atkinson-bold.woff`}
 	as="font"
 	type="font/woff"
